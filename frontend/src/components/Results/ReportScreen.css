@@ -1,0 +1,38 @@
+.results-container {
+  background-color: #f8f9fa;
+  padding: 24px;
+  margin-left: 24px;
+  margin-right: 24px;
+  border-radius: 12px;
+}
+
+.result-card {
+  border-left: 5px solid #00796b;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 16px 20px 16px 24px;
+  margin-bottom: 16px;
+}
+
+.result-title {
+  color: #00796b;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #b2dfdb;
+  padding-bottom: 4px;
+}
+
+.result-chip {
+  background-color: #e0f2f1;
+  border: 1px solid #00796b;
+  color: #004d40;
+  font-weight: 500;
+  margin-right: 6px;
+  margin-top: 6px;
+}
