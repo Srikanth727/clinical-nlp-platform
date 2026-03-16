@@ -82,7 +82,7 @@ async def process_document(request: Request):
     try:
         analysis = analyze_report(file_content)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Claude analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
 
     doc_uuid = metadata.get("X-Amz-Meta-Uuid")
     doc_filename = metadata.get("X-Amz-Meta-Filename")
