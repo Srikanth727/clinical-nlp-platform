@@ -65,7 +65,7 @@ services:
         echo 'Configuring MinIO...';
         mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minio123};
         mc mb --ignore-existing local/uploads;
-        mc event add local/uploads arn:minio:sqs::primary:webhook --event put 2>/dev/null || true;
+        mc event add local/uploads arn:minio:sqs::PRIMARY:webhook --event put 2>/dev/null || true;
         echo 'MinIO init complete.';
       "
 
