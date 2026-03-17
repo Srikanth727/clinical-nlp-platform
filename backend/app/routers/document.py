@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Query
 
@@ -43,7 +43,7 @@ async def upload_file(
         record = FileModel(
             uuid=file_uuid,
             filename=file.filename,
-            uploaded_at=datetime.now().isoformat(),
+            uploaded_at=datetime.now(timezone.utc).isoformat(),
             uploader=username,
             status="uploaded",
             content_type=file.content_type,
@@ -95,7 +95,7 @@ async def process_document(request: Request):
         summary=analysis.get("summary", ""),
         conditions=analysis.get("conditions", []),
         severity=analysis.get("severity", ""),
-        processed_at=datetime.now().isoformat(),
+        processed_at=datetime.now(timezone.utc).isoformat(),
     )
 
     try:
@@ -110,6 +110,25 @@ async def process_document(request: Request):
         raise HTTPException(status_code=500, detail=f"Failed to persist results: {e}")
 
     return result
+
+
+@router.delete("/{doc_uuid}", summary="Delete a document and its analysis result")
+async def delete_document(doc_uuid: str):
+    try:
+        item = FILES_TABLE.get_item(Key={"uuid": doc_uuid}).get("Item")
+        if not item:
+            raise HTTPException(status_code=404, detail=f"Document not found: {doc_uuid}")
+        try:
+            s3_client.delete_object(Bucket=settings.S3_BUCKET, Key=item["filename"])
+        except Exception:
+            pass  # file may already be gone
+        FILES_TABLE.delete_item(Key={"uuid": doc_uuid})
+        SUMMARY_TABLE.delete_item(Key={"uuid": doc_uuid})
+        return {"deleted": doc_uuid}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/result", response_model=ResultModel, summary="Fetch analysis result by UUID")

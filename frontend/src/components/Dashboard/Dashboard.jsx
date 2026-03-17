@@ -1,7 +1,8 @@
 import axios from 'axios'
 import React, { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Typography, Paper, List, ListItem } from '@mui/material'
+import { Box, Button, Typography, Paper, List, ListItem, IconButton } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { UserContext } from '../../context/UserContext'
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
@@ -21,6 +22,18 @@ const Dashboard = () => {
       .then((res) => setDocuments(res.data))
       .catch((err) => console.error('Error fetching documents:', err))
   }, [user, navigate])
+
+  const handleDelete = async (e, doc) => {
+    e.stopPropagation()
+    if (!window.confirm(`Delete "${doc.filename}"?`)) return
+    try {
+      await axios.delete(`${baseUrl}/document/${doc.uuid}`)
+      setDocuments((prev) => prev.filter((d) => d.uuid !== doc.uuid))
+    } catch (err) {
+      alert('Failed to delete document.')
+      console.error(err)
+    }
+  }
 
   const handleDocClick = (doc) => {
     if (doc.status === 'processed') {
@@ -90,7 +103,8 @@ const Dashboard = () => {
                 }}
                 onClick={() => handleDocClick(doc)}
               >
-                <Box sx={{ p: '14px 20px', display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ p: '14px 20px', display: 'flex', alignItems: 'flex-start' }}>
+                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <Typography sx={{ color: '#23272f', fontSize: 16, fontWeight: 500 }}>
                     {doc.filename}
                   </Typography>
@@ -106,6 +120,14 @@ const Dashboard = () => {
                   <Typography sx={{ fontSize: 13, color: '#9ca3af', mt: 0.5 }}>
                     Type: {doc.content_type.includes('pdf') ? 'PDF' : 'Text File'}
                   </Typography>
+                  </Box>
+                  <IconButton
+                    onClick={(e) => handleDelete(e, doc)}
+                    size="small"
+                    sx={{ color: '#9ca3af', '&:hover': { color: '#ef4444' }, mt: 0.5 }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                 </Box>
               </Paper>
             </ListItem>

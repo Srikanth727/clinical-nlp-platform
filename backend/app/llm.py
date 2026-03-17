@@ -24,6 +24,9 @@ Report:
 """
 
 
+_MAX_CHARS = 8000  # llama3.2 3B loses instruction-following beyond ~8K chars
+
+
 def analyze_report(text: str) -> dict:
     """Send clinical text to a local Ollama model and return structured results."""
     response = requests.post(
@@ -32,7 +35,7 @@ def analyze_report(text: str) -> dict:
             "model": OLLAMA_MODEL,
             "messages": [
                 {"role": "system", "content": _SYSTEM},
-                {"role": "user", "content": _PROMPT + text},
+                {"role": "user", "content": _PROMPT + text[:_MAX_CHARS]},
             ],
             "format": "json",   # forces Ollama to return valid JSON
             "stream": False,
